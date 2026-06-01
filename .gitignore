@@ -1,0 +1,17 @@
+# Local notes / source briefs
+jd.txt
+prompt.txt
+
+# Secrets
+.env
+
+# Local databases & vector store
+agent.db
+agent.db-wal
+agent.db-shm
+chroma_db/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
