@@ -19,8 +19,13 @@ ENV USE_TF=0 \
 WORKDIR /app
 
 # Install Python deps first so this layer caches across code changes.
+# Install the CPU-only torch wheel up front: Spaces has no GPU, so this avoids
+# pulling ~6 GB of unused NVIDIA CUDA libraries. sentence-transformers then sees
+# torch is already satisfied and skips the default CUDA build.
 COPY requirements.txt ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip \
+    && pip install torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install -r requirements.txt
 
 # Copy the rest of the project (the .dockerignore keeps secrets/db/web out).
 COPY . .
