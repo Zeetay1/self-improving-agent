@@ -313,10 +313,3 @@ self-improving-agent/
 ├── tests/        pytest regression suite
 └── scripts/      run_eval.py CLI (run / regression / status)
 ```
-
-## Constraints honoured
-- No LangChain; the agent loop is built directly.
-- No managed eval platform; the judge and runner are custom.
-- No external database; SQLite + ChromaDB, local only.
-- No prompts hardcoded outside `agent/prompts.py`.
-- Synchronous throughout, except where FastAPI's interface applies.
