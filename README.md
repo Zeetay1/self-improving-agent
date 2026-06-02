@@ -9,8 +9,28 @@ retrieve → generate → evaluate → log → improve → repeat
 ```
 
 Every good output becomes future few-shot fuel and a regression baseline; every
-bad output gets flagged for review. The system gets better the more it runs —
+bad output gets flagged for review. The system gets better the more it runs,
 without any human editing prompts in the hot path.
+
+---
+
+## Live Demo
+
+**🔗 Live demo:** _<add your deployed Vercel URL here>_
+
+The hosted demo runs the full loop from the browser: fill the brief (pre-filled
+with a FitFuel example), click **Generate**, and watch the agent retrieve past
+winners, generate three variants, and score each on four dimensions in real time.
+
+- **Frontend:** Next.js (App Router) deployed on **Vercel**, in [`web/`](web/).
+- **Backend:** the FastAPI app deployed on **Railway** (see [`Procfile`](Procfile)),
+  with CORS, a per-IP rate limit on `/run`, a `/stats` endpoint, and a startup
+  seed so a fresh deployment shows non-zero stats and working retrieval on the
+  very first visit.
+
+> Deployment env vars: the backend needs `GROQ_API_KEY` (and optionally
+> `CORS_ORIGINS` = your Vercel URL); the frontend needs `NEXT_PUBLIC_API_URL` =
+> your Railway backend URL. See the per-app `.env.example` files.
 
 ---
 
@@ -23,7 +43,7 @@ quality. This project is built around three ideas that make it a genuine
 1. **It judges itself on multiple axes.** Each output is scored 1–5 on four
    independent dimensions (hook strength, brand alignment, clarity, conversion
    intent) by a separate judge model. Dimension scores are first-class and
-   stored separately — there is no single "vibe" score driving decisions.
+   stored separately; there is no single "vibe" score driving decisions.
 
 2. **It remembers what worked.** High-scoring outputs are embedded by their
    brand brief and stored in a local vector store. On every new run, the agent
@@ -91,7 +111,7 @@ cp .env.example .env          # Windows: copy .env.example .env
 ```
 
 Only `GROQ_API_KEY` is required. Everything else (SQLite at `./agent.db`,
-ChromaDB at `./chroma_db`) is local — no other external services.
+ChromaDB at `./chroma_db`) is local; no other external services.
 
 ### First run
 
@@ -166,7 +186,7 @@ flagged).
      *"below quality threshold."*
 
 Because winners re-enter memory, the pool of few-shot exemplars improves run
-over run — that is the "self-improving" part.
+over run; that is the "self-improving" part.
 
 ---
 
@@ -182,7 +202,7 @@ Four dimensions, each 1–5:
 | `clarity`          | Is the message immediately understandable?          | 0.25   |
 | `conversion_intent`| Does it drive toward the stated goal?               | 0.20   |
 
-The weighted average is **internal only** — used for thresholds and ranking.
+The weighted average is **internal only**, used for thresholds and ranking.
 All four raw dimensions are always stored separately.
 
 ### Golden dataset (`evals/golden.py`)
@@ -214,7 +234,7 @@ spuriously) when `GROQ_API_KEY` is unset or the golden dataset is still empty.
 
 ## Prompt versioning & how to swap versions safely
 
-All prompt text lives in `agent/prompts.py` — nothing is hardcoded anywhere
+All prompt text lives in `agent/prompts.py`; nothing is hardcoded anywhere
 else. Each prompt is a named, versioned constant (`GENERATION_PROMPT_V1`,
 `GENERATION_PROMPT_V2`, …). A single constant selects which is live:
 
@@ -246,8 +266,8 @@ is used in a real run" means in practice: the golden dataset is the gate.
 
 ## Design Decisions
 
-**Why ChromaDB for memory.** The agent needs *semantic* retrieval — "find past
-briefs like this one" — not exact lookups. ChromaDB gives a persistent local
+**Why ChromaDB for memory.** The agent needs *semantic* retrieval: "find past
+briefs like this one", not exact lookups. ChromaDB gives a persistent local
 vector store with cosine similarity and zero external services, and it pairs
 cleanly with local sentence-transformers embeddings. SQLite alone can't do
 nearest-neighbour search over brief semantics; a hosted vector DB would violate
@@ -257,12 +277,12 @@ the "local only" constraint and add ops overhead for no benefit at this scale.
 is unactionable and easy for a judge to anchor on. Scoring four independent
 dimensions tells you *why* copy is weak (great hook, poor clarity) and makes the
 signal far more stable and debuggable. We do compute a weighted average, but
-only for internal thresholds/ranking — the four raw dimensions are always
+only for internal thresholds/ranking; the four raw dimensions are always
 stored, so we never lose information by collapsing too early.
 
 **Why SQLite for eval storage.** Eval results are structured, relational, and
 queryable (runs → outputs → scores; golden; flagged). SQLite gives ACID
-guarantees, trivial setup, a single-file database, and real SQL — ideal for run
+guarantees, trivial setup, a single-file database, and real SQL, ideal for run
 history and a golden dataset. It needs no server and ships with Python. A hosted
 DB would add infrastructure with no upside for a local, single-node harness.
 
@@ -295,8 +315,8 @@ self-improving-agent/
 ```
 
 ## Constraints honoured
-- No LangChain — the agent loop is built directly.
-- No managed eval platform — the judge and runner are custom.
-- No external database — SQLite + ChromaDB, local only.
+- No LangChain; the agent loop is built directly.
+- No managed eval platform; the judge and runner are custom.
+- No external database; SQLite + ChromaDB, local only.
 - No prompts hardcoded outside `agent/prompts.py`.
 - Synchronous throughout, except where FastAPI's interface applies.
