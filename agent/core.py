@@ -90,6 +90,8 @@ class Agent:
             "brief": brief,
             "prompt_version": prompt_version,
             "retrieved_examples": len(retrieved),
+            # Surfaced to the frontend so it can show the loop is self-improving.
+            "retrieved_count": len(retrieved),
             "outputs": scored_outputs,
             "feedback": feedback_summary,
         }

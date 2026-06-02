@@ -1,0 +1,59 @@
+[
+  {
+    "brief": {
+      "brand": "FitFuel",
+      "product": "High-protein meal replacement shake",
+      "audience": "Busy professionals aged 25-40",
+      "tone": "Energetic and no-nonsense",
+      "goal": "Drive trial purchases"
+    },
+    "variant_type": "headline",
+    "output": "Fuel Your Hustle, Not Your Hunger",
+    "scores": {
+      "hook_strength": 5,
+      "brand_alignment": 5,
+      "clarity": 5,
+      "conversion_intent": 4,
+      "weighted_average": 4.8
+    },
+    "prompt_version": "GENERATION_PROMPT_V1"
+  },
+  {
+    "brief": {
+      "brand": "FitFuel",
+      "product": "High-protein meal replacement shake",
+      "audience": "Busy professionals aged 25-40",
+      "tone": "Energetic and no-nonsense",
+      "goal": "Drive trial purchases"
+    },
+    "variant_type": "body",
+    "output": "No time to cook, no patience for slumps. FitFuel packs 30g of protein into one fast shake so you stay sharp from the 9am standup to the 6pm sprint. Real fuel, zero fuss.",
+    "scores": {
+      "hook_strength": 4,
+      "brand_alignment": 5,
+      "clarity": 5,
+      "conversion_intent": 4,
+      "weighted_average": 4.5
+    },
+    "prompt_version": "GENERATION_PROMPT_V1"
+  },
+  {
+    "brief": {
+      "brand": "BrightBrew",
+      "product": "Cold brew coffee concentrate",
+      "audience": "Remote workers who want better coffee at home",
+      "tone": "Calm, premium, understated",
+      "goal": "Drive subscription sign-ups"
+    },
+    "variant_type": "body",
+    "output": "Skip the cafe queue. One bottle of BrightBrew concentrate makes twelve smooth, low-acidity cups right at your desk. Subscribe and your next batch arrives before you run out.",
+    "scores": {
+      "hook_strength": 4,
+      "brand_alignment": 4,
+      "clarity": 5,
+      "conversion_intent": 4,
+      "weighted_average": 4.25
+    },
+    "prompt_version": "GENERATION_PROMPT_V1"
+  }
+]

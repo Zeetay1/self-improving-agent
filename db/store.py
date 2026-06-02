@@ -239,6 +239,22 @@ class Store:
             result.append(d)
         return result
 
+    # ------------------------------------------------------------------ counts
+    def count_runs(self) -> int:
+        with self._lock:
+            row = self._conn.execute("SELECT COUNT(*) AS n FROM runs").fetchone()
+        return int(row["n"])
+
+    def count_golden(self) -> int:
+        with self._lock:
+            row = self._conn.execute("SELECT COUNT(*) AS n FROM golden").fetchone()
+        return int(row["n"])
+
+    def count_flagged(self) -> int:
+        with self._lock:
+            row = self._conn.execute("SELECT COUNT(*) AS n FROM flagged_outputs").fetchone()
+        return int(row["n"])
+
     # ------------------------------------------------------------------- close
     def close(self) -> None:
         with self._lock:
