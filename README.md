@@ -25,7 +25,7 @@ without any human editing prompts in the hot path.
 
 ## Live Demo
 
-**🔗 Live demo:** _<add your deployed Vercel URL here>_
+**🔗 Live demo:** https://self-improving-agent-delta.vercel.app
 
 The hosted demo runs the full loop from the browser: fill the brief (pre-filled
 with a FitFuel example), click **Generate**, and watch the agent retrieve past
