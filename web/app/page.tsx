@@ -8,12 +8,12 @@ import { StatsStrip } from "@/components/StatsStrip";
 import { ApiError, getStats, runAgent } from "@/lib/api";
 import type { Brief, RunResponse, Stats } from "@/lib/types";
 
-const EXAMPLE_BRIEF: Brief = {
-  brand: "FitFuel",
-  product: "High-protein meal replacement shake",
-  audience: "Busy professionals aged 25-40",
-  tone: "Energetic and no-nonsense",
-  goal: "Drive trial purchases",
+const EMPTY_BRIEF: Brief = {
+  brand: "",
+  product: "",
+  audience: "",
+  tone: "",
+  goal: "",
 };
 
 // Ordered variant rendering regardless of backend ordering.
@@ -30,7 +30,7 @@ const LOADING_PHASES = [
 ];
 
 export default function Page() {
-  const [brief, setBrief] = useState<Brief>(EXAMPLE_BRIEF);
+  const [brief, setBrief] = useState<Brief>(EMPTY_BRIEF);
   const [loading, setLoading] = useState(false);
   const [phase, setPhase] = useState(0);
   const [result, setResult] = useState<RunResponse | null>(null);
@@ -69,7 +69,12 @@ export default function Page() {
   const onChange = (key: keyof Brief, value: string) =>
     setBrief((b) => ({ ...b, [key]: value }));
 
+  const isComplete = (Object.keys(brief) as (keyof Brief)[]).every(
+    (k) => brief[k].trim() !== "",
+  );
+
   const onSubmit = async () => {
+    if (!isComplete) return;
     setLoading(true);
     setError(null);
     try {
@@ -115,6 +120,7 @@ export default function Page() {
         onSubmit={onSubmit}
         loading={loading}
         statusText={LOADING_PHASES[phase]}
+        canSubmit={isComplete}
       />
 
       {/* Error */}
@@ -153,8 +159,8 @@ export default function Page() {
       </div>
 
       <footer className="mt-10 border-t border-ink-700 pt-5 font-mono text-[11px] text-zinc-600">
-        Backend: FastAPI on Railway · Frontend: Next.js on Vercel · Judge &
-        generator: llama-3.3-70b
+        Backend: FastAPI on Hugging Face Spaces · Frontend: Next.js on Vercel ·
+        Judge &amp; generator: llama-3.3-70b
       </footer>
     </main>
   );

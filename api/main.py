@@ -1,7 +1,7 @@
 """FastAPI app for the hosted public demo.
 
 Endpoints:
-- GET  /health  -> liveness probe for Railway
+- GET  /health  -> liveness probe
 - GET  /stats   -> live counts (runs, golden, flagged) for the frontend strip
 - POST /run     -> full agent loop (rate limited), returns outputs + scores
 

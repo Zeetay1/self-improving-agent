@@ -32,14 +32,14 @@ with a FitFuel example), click **Generate**, and watch the agent retrieve past
 winners, generate three variants, and score each on four dimensions in real time.
 
 - **Frontend:** Next.js (App Router) deployed on **Vercel**, in [`web/`](web/).
-- **Backend:** the FastAPI app deployed on **Railway** (see [`Procfile`](Procfile)),
+- **Backend:** the FastAPI app deployed on **Hugging Face Spaces** (Docker, see [`Dockerfile`](Dockerfile)),
   with CORS, a per-IP rate limit on `/run`, a `/stats` endpoint, and a startup
   seed so a fresh deployment shows non-zero stats and working retrieval on the
   very first visit.
 
 > Deployment env vars: the backend needs `GROQ_API_KEY` (and optionally
 > `CORS_ORIGINS` = your Vercel URL); the frontend needs `NEXT_PUBLIC_API_URL` =
-> your Railway backend URL. See the per-app `.env.example` files.
+> your Hugging Face Space URL. See the per-app `.env.example` files.
 
 ---
 

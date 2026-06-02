@@ -1,6 +1,5 @@
-# Local notes / source briefs
-jd.txt
-prompt.txt
+# Local notes
+local/
 
 # Secrets
 .env
