@@ -1,3 +1,12 @@
+---
+title: Self Improving Ad Copy Agent
+emoji: 🧠
+colorFrom: gray
+colorTo: gray
+sdk: docker
+pinned: false
+---
+
 # Self-Improving Ad Copy Agent
 
 A small agentic system that generates direct-to-consumer (DTC) ad copy,
