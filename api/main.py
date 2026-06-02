@@ -5,10 +5,6 @@ Endpoints:
 - GET  /stats   -> live counts (runs, golden, flagged) for the frontend strip
 - POST /run     -> full agent loop (rate limited), returns outputs + scores
 
-CORS is configured for the Vercel frontend, the Groq key is protected by a
-per-IP rate limit, and a fresh deployment is seeded so the first visitor sees
-non-zero stats and working retrieval.
-
 Run locally:  uvicorn api.main:app --reload
 """
 
@@ -30,10 +26,7 @@ from slowapi.util import get_remote_address  # noqa: E402
 from agent.core import Agent  # noqa: E402  (after load_dotenv on purpose)
 from seed.loader import load_seed_if_empty  # noqa: E402
 
-# --------------------------------------------------------------------------- #
-# Shared singletons
-# --------------------------------------------------------------------------- #
-# A single shared agent (and therefore shared Store/Memory) for the process.
+# one shared agent (and Store/Memory) per process
 _agent: Agent | None = None
 
 
@@ -44,9 +37,6 @@ def get_agent() -> Agent:
     return _agent
 
 
-# --------------------------------------------------------------------------- #
-# CORS origins
-# --------------------------------------------------------------------------- #
 def _cors_origins() -> list[str]:
     """Origins from CORS_ORIGINS (comma-separated), always plus localhost:3000.
 
@@ -61,9 +51,7 @@ def _cors_origins() -> list[str]:
     return origins
 
 
-# --------------------------------------------------------------------------- #
-# Lifespan: seed a fresh deployment on startup
-# --------------------------------------------------------------------------- #
+# seed golden + memory on a fresh deployment so the first visitor isn't cold
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -71,14 +59,11 @@ async def lifespan(app: FastAPI):
         seeded = load_seed_if_empty(agent.store, agent.memory)
         if seeded:
             print(f"[startup] Seeded {seeded} golden/memory example(s).")
-    except Exception as exc:  # noqa: BLE001 — never block startup on seeding.
+    except Exception as exc:  # noqa: BLE001 - never block startup on seeding.
         print(f"[startup] Seed skipped: {exc}")
     yield
 
 
-# --------------------------------------------------------------------------- #
-# App + rate limiter
-# --------------------------------------------------------------------------- #
 limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(title="Self-Improving Ad Copy Agent", version="1.0.0", lifespan=lifespan)
@@ -94,9 +79,6 @@ app.add_middleware(
 )
 
 
-# --------------------------------------------------------------------------- #
-# Schemas
-# --------------------------------------------------------------------------- #
 class BrandBrief(BaseModel):
     brand: str = Field(..., examples=["FitFuel"])
     product: str = Field(..., examples=["High-protein meal replacement shake"])
@@ -105,9 +87,6 @@ class BrandBrief(BaseModel):
     goal: str = Field(..., examples=["Drive trial purchases"])
 
 
-# --------------------------------------------------------------------------- #
-# Endpoints
-# --------------------------------------------------------------------------- #
 @app.get("/")
 def root() -> dict[str, str]:
     return {"status": "ok", "endpoint": "POST /run with a brand brief"}
@@ -138,5 +117,5 @@ def run(request: Request, brief: BrandBrief) -> dict[str, Any]:
         return agent.run(brief.model_dump())
     except RuntimeError as exc:  # e.g. missing GROQ_API_KEY
         raise HTTPException(status_code=500, detail=str(exc)) from exc
-    except Exception as exc:  # noqa: BLE001 — surface generation/judge failures
+    except Exception as exc:  # noqa: BLE001 - surface generation/judge failures
         raise HTTPException(status_code=502, detail=f"Agent run failed: {exc}") from exc

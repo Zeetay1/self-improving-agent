@@ -1,30 +1,19 @@
-"""All prompts live here and nowhere else.
+"""All prompts live here, versioned by string key.
 
-Each prompt is versioned with an explicit string key. The single source of
-truth for which generation prompt is live is ACTIVE_PROMPT_VERSION. Swapping
-that constant is the supported way to roll a new prompt forward — and it is
-what the regression check guards (see evals/runner.py).
-
-Nothing in the codebase should hardcode prompt text outside this module.
+ACTIVE_PROMPT_VERSION selects the live generation prompt; swapping it is guarded
+by the regression check (evals/runner.py). Don't hardcode prompt text elsewhere.
 """
 
-# ---------------------------------------------------------------------------
-# Active version selector
-# ---------------------------------------------------------------------------
-# Change this to promote a new generation prompt. The regression runner is
-# expected to pass against the golden dataset before this is used for real.
+# Run the regression suite before promoting a new version.
 ACTIVE_PROMPT_VERSION = "GENERATION_PROMPT_V1"
 
 
-# ---------------------------------------------------------------------------
-# Generation prompts
-# ---------------------------------------------------------------------------
 GENERATION_PROMPT_V1 = """You are a senior direct-to-consumer (DTC) ad copywriter.
 
 You will be given a brand brief. Write three distinct pieces of ad copy:
-1. A HEADLINE hook — one short line that immediately grabs attention.
-2. A BODY copy — 2-3 sentences that build desire and reflect the brand tone.
-3. A CTA — a single short call to action that drives the stated goal.
+1. A HEADLINE hook - one short line that immediately grabs attention.
+2. A BODY copy - 2-3 sentences that build desire and reflect the brand tone.
+3. A CTA - a single short call to action that drives the stated goal.
 
 Rules:
 - Match the brief's tone and speak directly to the described audience.
@@ -52,9 +41,9 @@ GENERATION_PROMPT_V2 = """You are an award-winning DTC performance copywriter wh
 copy that converts cold traffic.
 
 You will be given a brand brief. Produce three pieces of ad copy:
-1. HEADLINE — a scroll-stopping hook of at most 8 words.
-2. BODY — 2-3 sentences leading with the strongest benefit, in the brand's voice.
-3. CTA — an imperative call to action tied directly to the stated goal.
+1. HEADLINE - a scroll-stopping hook of at most 8 words.
+2. BODY - 2-3 sentences leading with the strongest benefit, in the brand's voice.
+3. CTA - an imperative call to action tied directly to the stated goal.
 
 Rules:
 - Lead with benefit, not feature. Speak to the exact audience in the brief.
@@ -82,9 +71,6 @@ PROMPT_REGISTRY = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Few-shot helpers
-# ---------------------------------------------------------------------------
 FEW_SHOT_HEADER = "Past high-performing examples (learn from their style, do not copy verbatim):"
 
 
@@ -127,9 +113,7 @@ def render_generation_prompt(brief: dict, few_shot_block: str, version: str | No
     )
 
 
-# ---------------------------------------------------------------------------
-# Judge prompt (LLM-as-judge). Versioned alongside generation prompts.
-# ---------------------------------------------------------------------------
+# Judge prompt, versioned alongside the generation prompts.
 JUDGE_PROMPT_VERSION = "JUDGE_PROMPT_V1"
 
 JUDGE_PROMPT_V1 = """You are a strict, fair advertising copy evaluator.

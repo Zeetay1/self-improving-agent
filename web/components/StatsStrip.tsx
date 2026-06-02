@@ -5,7 +5,7 @@ export function StatsStrip({ stats }: { stats: Stats | null }) {
     <span className="inline-flex items-baseline gap-1.5">
       <span className="text-zinc-500">{label}</span>
       <span className="font-mono text-zinc-200 tabular-nums">
-        {value === null ? "–" : value}
+        {value === null ? "-" : value}
       </span>
     </span>
   );

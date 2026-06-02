@@ -1,8 +1,7 @@
-"""Agent tools: the LLM client wrapper and the structured-generation helpers.
+"""Groq client wrapper and JSON parsing helpers.
 
-We deliberately call Groq directly (no LangChain). A single chat-completion
-helper is shared by both the generator and the judge so model/config lives in
-one place.
+One chat() helper is shared by the generator and the judge so model config
+lives in one place. No LangChain.
 """
 
 import json

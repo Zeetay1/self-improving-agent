@@ -11,5 +11,5 @@ try:  # truststore is optional; ignore if unavailable.
     import truststore
 
     truststore.inject_into_ssl()
-except Exception:  # noqa: BLE001 — best-effort; fall back to default certs.
+except Exception:  # noqa: BLE001 - best-effort; fall back to default certs.
     pass

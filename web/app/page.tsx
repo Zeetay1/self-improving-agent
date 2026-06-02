@@ -24,9 +24,9 @@ const ORDER: RunResponse["outputs"][number]["variant_type"][] = [
 ];
 
 const LOADING_PHASES = [
-  "Retrieving examples…",
-  "Generating variants…",
-  "Scoring with the judge…",
+  "Retrieving examples...",
+  "Generating variants...",
+  "Scoring with the judge...",
 ];
 
 export default function Page() {

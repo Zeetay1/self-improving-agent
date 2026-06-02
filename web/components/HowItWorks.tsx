@@ -7,12 +7,12 @@ const STEPS = [
   {
     n: "02",
     title: "Judge",
-    body: "A separate LLM-as-judge scores each variant 1–5 on four dimensions: hook strength, brand alignment, clarity, and conversion intent.",
+    body: "A separate LLM-as-judge scores each variant 1-5 on four dimensions: hook strength, brand alignment, clarity, and conversion intent.",
   },
   {
     n: "03",
     title: "Remember",
-    body: "Outputs scoring ≥ 4.0 are promoted into a golden dataset and a vector memory; weak ones (< 2.5) get flagged for review.",
+    body: "Outputs scoring >= 4.0 are promoted into a golden dataset and a vector memory; weak ones (< 2.5) get flagged for review.",
   },
   {
     n: "04",

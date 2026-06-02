@@ -14,7 +14,7 @@ evaluates its **own** outputs with an LLM-as-judge, stores the results, and
 uses that signal to improve over time. The loop runs end to end:
 
 ```
-retrieve → generate → evaluate → log → improve → repeat
+retrieve -> generate -> evaluate -> log -> improve -> repeat
 ```
 
 Every good output becomes future few-shot fuel and a regression baseline; every
@@ -49,7 +49,7 @@ Most "LLM app" demos are a single prompt with no memory and no notion of
 quality. This project is built around three ideas that make it a genuine
 *self-improving* loop:
 
-1. **It judges itself on multiple axes.** Each output is scored 1–5 on four
+1. **It judges itself on multiple axes.** Each output is scored 1-5 on four
    independent dimensions (hook strength, brand alignment, clarity, conversion
    intent) by a separate judge model. Dimension scores are first-class and
    stored separately; there is no single "vibe" score driving decisions.
@@ -71,17 +71,15 @@ prompt versioning reinforce each other.
 
 ## Architecture
 
-```
-              ┌──────────────────────────── agent/core.py ───────────────────────────┐
-brand brief ─▶│ 1. retrieve top-3 high-scoring past outputs   (agent/memory.py, Chroma)│
-              │ 2. inject as few-shot examples                (agent/prompts.py)        │
-              │ 3. generate headline / body / cta             (agent/tools.py → Groq)   │
-              │ 4. judge each variant on 4 dimensions         (evals/judge.py → Groq)   │
-              │ 5. store run + outputs + scores               (db/store.py → SQLite)    │
-              │ 6. promote winners (≥4.0) → golden + memory   (feedback/loop.py)        │
-              │ 7. flag losers (<2.5) for review              (feedback/loop.py)        │
-              └────────────────────────────────────────────────────────────────────────┘
-```
+A single run flows through `agent/core.py`:
+
+1. Retrieve top-3 high-scoring past outputs (`agent/memory.py`, ChromaDB)
+2. Inject them as few-shot examples (`agent/prompts.py`)
+3. Generate headline / body / cta with Groq (`agent/tools.py`)
+4. Judge each variant on 4 dimensions with Groq (`evals/judge.py`)
+5. Store run + outputs + scores in SQLite (`db/store.py`)
+6. Promote winners (>= 4.0) to golden + memory (`feedback/loop.py`)
+7. Flag losers (< 2.5) for review (`feedback/loop.py`)
 
 | Layer            | File(s)                          | Responsibility                                  |
 |------------------|----------------------------------|-------------------------------------------------|
@@ -175,21 +173,21 @@ flagged).
 
 1. **Retrieve.** The incoming brief is embedded (locally, via
    `all-MiniLM-L6-v2`) and used to query ChromaDB for the **top-3 most similar
-   past outputs that scored ≥ 3.5/5**. Only proven-good copy is ever retrieved.
+   past outputs that scored >= 3.5/5**. Only proven-good copy is ever retrieved.
 
 2. **Generate.** Those examples are injected into the active generation prompt
    under a *"Past high-performing examples"* section, and the model produces a
    headline hook, body copy, and a CTA in one structured JSON response.
 
 3. **Evaluate.** Each of the three variants is immediately scored by the judge
-   model on the four rubric dimensions. Scores are clamped to 1–5 and a weighted
+   model on the four rubric dimensions. Scores are clamped to 1-5 and a weighted
    average is computed for internal ranking only.
 
 4. **Log.** The run, every variant, and every dimension score are written to
    SQLite.
 
 5. **Improve.** The feedback loop:
-   - promotes any output with a weighted average **≥ 4.0** into both the golden
+   - promotes any output with a weighted average **>= 4.0** into both the golden
      dataset and ChromaDB memory (so it can be retrieved next time);
    - flags any output **< 2.5** into the `flagged_outputs` table with the reason
      *"below quality threshold."*
@@ -202,7 +200,7 @@ over run; that is the "self-improving" part.
 ## Evaluation & regression tests
 
 ### The rubric (`evals/rubric.py`)
-Four dimensions, each 1–5:
+Four dimensions, each 1-5:
 
 | Dimension          | Question                                            | Weight |
 |--------------------|-----------------------------------------------------|:------:|
@@ -215,7 +213,7 @@ The weighted average is **internal only**, used for thresholds and ranking.
 All four raw dimensions are always stored separately.
 
 ### Golden dataset (`evals/golden.py`)
-Any output with weighted average **≥ 4.0** is captured (brief, output, all
+Any output with weighted average **>= 4.0** is captured (brief, output, all
 scores, prompt version, timestamp). This is the regression baseline.
 
 ### Regression runner (`evals/runner.py`)
@@ -245,7 +243,7 @@ spuriously) when `GROQ_API_KEY` is unset or the golden dataset is still empty.
 
 All prompt text lives in `agent/prompts.py`; nothing is hardcoded anywhere
 else. Each prompt is a named, versioned constant (`GENERATION_PROMPT_V1`,
-`GENERATION_PROMPT_V2`, …). A single constant selects which is live:
+`GENERATION_PROMPT_V2`, ...). A single constant selects which is live:
 
 ```python
 ACTIVE_PROMPT_VERSION = "GENERATION_PROMPT_V1"
@@ -282,7 +280,7 @@ cleanly with local sentence-transformers embeddings. SQLite alone can't do
 nearest-neighbour search over brief semantics; a hosted vector DB would violate
 the "local only" constraint and add ops overhead for no benefit at this scale.
 
-**Why dimension scoring over a composite score.** A single 1–10 "quality" score
+**Why dimension scoring over a composite score.** A single 1-10 "quality" score
 is unactionable and easy for a judge to anchor on. Scoring four independent
 dimensions tells you *why* copy is weak (great hook, poor clarity) and makes the
 signal far more stable and debuggable. We do compute a weighted average, but
@@ -290,19 +288,19 @@ only for internal thresholds/ranking; the four raw dimensions are always
 stored, so we never lose information by collapsing too early.
 
 **Why SQLite for eval storage.** Eval results are structured, relational, and
-queryable (runs → outputs → scores; golden; flagged). SQLite gives ACID
+queryable (runs -> outputs -> scores; golden; flagged). SQLite gives ACID
 guarantees, trivial setup, a single-file database, and real SQL, ideal for run
 history and a golden dataset. It needs no server and ships with Python. A hosted
 DB would add infrastructure with no upside for a local, single-node harness.
 
-**Why the 4.0 threshold for golden inclusion.** On a 1–5 scale, 4.0 means
+**Why the 4.0 threshold for golden inclusion.** On a 1-5 scale, 4.0 means
 "clearly good on the weighted blend" without demanding perfection. Set it lower
 and the golden set fills with mediocre copy, weakening both the regression
 baseline and the few-shot exemplars. Set it higher (e.g. 4.5) and you rarely
 capture anything, so the system never accumulates a baseline or improves. 4.0 is
 the point where entries are good enough to *defend* against regressions and to
 *teach* future runs. (The retrieval floor is a more permissive 3.5 so memory can
-draw on a slightly wider pool of solid examples, while only the strongest ≥4.0
+draw on a slightly wider pool of solid examples, while only the strongest >=4.0
 outputs become protected golden baselines.)
 
 ---

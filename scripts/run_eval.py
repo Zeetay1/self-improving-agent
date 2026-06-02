@@ -49,7 +49,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     brief = _load_brief(args.brief)
     console.print(Panel.fit(json.dumps(brief, indent=2), title="Brand Brief", border_style="cyan"))
 
-    with console.status("[bold green]Running agent loop (retrieve → generate → evaluate → feedback)..."):
+    with console.status("[bold green]Running agent loop (retrieve -> generate -> evaluate -> feedback)..."):
         agent = Agent()
         result = agent.run(brief)
 
@@ -95,7 +95,7 @@ def cmd_regression(args: argparse.Namespace) -> int:
     with console.status("[bold green]Running golden regression eval..."):
         report = run_golden_eval()
 
-    table = Table(title=f"Regression Eval — {report.prompt_version}", show_lines=True)
+    table = Table(title=f"Regression Eval - {report.prompt_version}", show_lines=True)
     table.add_column("#", justify="right")
     table.add_column("Variant", style="cyan")
     table.add_column("Baseline", justify="right")
@@ -115,11 +115,11 @@ def cmd_regression(args: argparse.Namespace) -> int:
         console.print(table)
     console.print()
     if report.passed:
-        console.print(Panel.fit("PASS — no entry regressed beyond tolerance.", border_style="green"))
+        console.print(Panel.fit("PASS - no entry regressed beyond tolerance.", border_style="green"))
     else:
         console.print(
             Panel.fit(
-                f"FAIL — {len(report.regressions)} entry(ies) regressed. "
+                f"FAIL - {len(report.regressions)} entry(ies) regressed. "
                 "Do not promote this prompt version.",
                 border_style="red",
             )

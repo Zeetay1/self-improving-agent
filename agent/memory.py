@@ -1,12 +1,8 @@
-"""Retrieval and storage logic backed by ChromaDB + sentence-transformers.
+"""Vector memory backed by ChromaDB + sentence-transformers.
 
-Memory holds past generated outputs that scored well, embedded by their brand
-brief. On each new run we retrieve the top-k most similar high-scoring entries
-and feed them back as few-shot examples — this is the substrate of the
-self-improving loop.
-
-Only entries scoring above RETRIEVAL_SCORE_FLOOR (3.5/5) are ever stored or
-returned, so the agent only learns from outputs that actually worked.
+Stores high-scoring outputs embedded by their brief, and retrieves the most
+similar past winners as few-shot examples. Only entries >= RETRIEVAL_SCORE_FLOOR
+(3.5/5) are kept or returned.
 """
 
 import os

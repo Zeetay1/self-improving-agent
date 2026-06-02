@@ -1,8 +1,4 @@
-"""SQLite interface for runs, scores, golden dataset, flagged outputs, and versions.
-
-This is the persistence backbone of the system. Everything else depends on it.
-All access goes through the Store class so the schema lives in exactly one place.
-"""
+"""SQLite store for runs, outputs, the golden dataset, and flagged outputs."""
 
 import json
 import os
@@ -19,11 +15,8 @@ def _utcnow() -> str:
 
 
 class Store:
-    """Thin, explicit wrapper over a local SQLite database.
-
-    A single connection is shared with a lock so the same Store can be used
-    from FastAPI request handlers and CLI scripts without surprises.
-    """
+    """Local SQLite wrapper. One connection guarded by a lock so the API
+    handlers and CLI can share a Store."""
 
     def __init__(self, path: str = DEFAULT_SQLITE_PATH):
         self.path = path
@@ -33,7 +26,6 @@ class Store:
         self._conn.execute("PRAGMA journal_mode=WAL;")
         self._init_schema()
 
-    # ------------------------------------------------------------------ schema
     def _init_schema(self) -> None:
         with self._lock, self._conn:
             self._conn.executescript(
@@ -87,7 +79,6 @@ class Store:
                 """
             )
 
-    # -------------------------------------------------------------------- runs
     def create_run(self, brief: dict[str, Any], prompt_version: str) -> int:
         with self._lock, self._conn:
             cur = self._conn.execute(
@@ -103,7 +94,6 @@ class Store:
             ).fetchone()
         return dict(row) if row else None
 
-    # ----------------------------------------------------------------- outputs
     def add_output(
         self,
         run_id: int,
@@ -144,7 +134,6 @@ class Store:
             ).fetchall()
         return [dict(r) for r in rows]
 
-    # ------------------------------------------------------------------ golden
     def add_golden(
         self,
         brief: dict[str, Any],
@@ -198,7 +187,6 @@ class Store:
             ).fetchone()
         return row is not None
 
-    # ----------------------------------------------------------------- flagged
     def add_flagged(
         self,
         brief: dict[str, Any],
@@ -239,7 +227,6 @@ class Store:
             result.append(d)
         return result
 
-    # ------------------------------------------------------------------ counts
     def count_runs(self) -> int:
         with self._lock:
             row = self._conn.execute("SELECT COUNT(*) AS n FROM runs").fetchone()
@@ -255,7 +242,6 @@ class Store:
             row = self._conn.execute("SELECT COUNT(*) AS n FROM flagged_outputs").fetchone()
         return int(row["n"])
 
-    # ------------------------------------------------------------------- close
     def close(self) -> None:
         with self._lock:
             self._conn.close()

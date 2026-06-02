@@ -1,9 +1,7 @@
 """LLM-as-judge scorer.
 
-Uses the same Groq model as the generator (llama-3.3-70b-versatile) but with a
-strict, low-temperature judging prompt. Returns the four dimension scores plus
-a derived weighted average and a one-line rationale. It never collapses the
-output into a single composite the way a naive scorer would.
+Same Groq model as the generator, but a strict, temperature-0 prompt. Returns
+the four dimension scores plus a weighted average and a short rationale.
 """
 
 from typing import Any
@@ -23,7 +21,7 @@ def judge_output(brief: dict[str, Any], variant_type: str, output: str) -> dict[
     the valid range and default low.
     """
     if not output.strip():
-        # Nothing to score — treat as the floor.
+        # Nothing to score - treat as the floor.
         scores = rubric.normalize_scores({})
         scores["rationale"] = "Empty output."
         return scores

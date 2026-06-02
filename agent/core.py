@@ -1,8 +1,6 @@
 """The main agent loop: retrieve -> generate -> evaluate -> store -> feedback.
 
-This ties memory, generation, the eval judge, persistence, and the feedback
-loop together. It is intentionally synchronous and dependency-injected so it
-can be driven from the API, the CLI, or tests with the same code path.
+Synchronous and dependency-injected so the API, CLI, and tests share one path.
 """
 
 from typing import Any, Optional
@@ -26,7 +24,6 @@ class Agent:
         self.memory = memory or Memory()
         self.temperature = temperature
 
-    # --------------------------------------------------------------- generate
     def generate_variants(self, brief: dict[str, Any], few_shot_block: str, prompt_version: str) -> dict[str, str]:
         """Call the LLM once and parse out the three ad-copy variants."""
         prompt = prompts.render_generation_prompt(brief, few_shot_block, prompt_version)
@@ -38,27 +35,19 @@ class Agent:
             "cta": str(parsed.get("cta", "")).strip(),
         }
 
-    # -------------------------------------------------------------------- run
     def run(self, brief: dict[str, Any]) -> dict[str, Any]:
         """Execute the full loop for one brand brief and return outputs + scores."""
-        # Imported here to keep module import order clean (evals/feedback import
-        # nothing from core, but core depends on them at call time).
+        # imported here to avoid an import cycle (core <-> evals/feedback)
         from evals.judge import judge_output
         from feedback.loop import run_feedback
 
         prompt_version = prompts.ACTIVE_PROMPT_VERSION
 
-        # 1. Retrieve top-3 most relevant high-scoring past outputs.
         retrieved = self.memory.retrieve(brief, k=3)
-
-        # 2. Inject them as few-shot examples.
         few_shot_block = prompts.build_few_shot_block(retrieved)
-
-        # 3. Generate the three variants.
         variants = self.generate_variants(brief, few_shot_block, prompt_version)
 
-        # 4. Evaluate every variant immediately.
-        # 5. Persist the run and each scored output.
+        # judge each variant and persist the run
         run_id = self.store.create_run(brief, prompt_version)
 
         scored_outputs: list[dict[str, Any]] = []
@@ -74,8 +63,7 @@ class Agent:
                 }
             )
 
-        # 6 + 7. Feedback loop: promote good outputs to golden + memory,
-        # flag poor ones for review.
+        # promote winners to golden + memory, flag the weak ones
         feedback_summary = run_feedback(
             store=self.store,
             memory=self.memory,
@@ -90,8 +78,7 @@ class Agent:
             "brief": brief,
             "prompt_version": prompt_version,
             "retrieved_examples": len(retrieved),
-            # Surfaced to the frontend so it can show the loop is self-improving.
-            "retrieved_count": len(retrieved),
+            "retrieved_count": len(retrieved),  # what the frontend reads
             "outputs": scored_outputs,
             "feedback": feedback_summary,
         }

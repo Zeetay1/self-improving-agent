@@ -1,9 +1,6 @@
-"""Scoring rubric definitions.
-
-The rubric is the contract between the judge and the rest of the system:
-the four dimensions, their 1-5 scale, and the weighting used to derive a
-single internal number. Per the design, dimension scores are first-class and
-stored separately; the weighted average exists only for ranking/thresholds.
+"""Scoring rubric: four 1-5 dimensions and the weights for the internal
+weighted average. Dimension scores are stored separately; the weighted average
+is only used for ranking/thresholds.
 """
 
 # The four scored dimensions, each on a 1-5 integer scale.

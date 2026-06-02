@@ -73,7 +73,7 @@ export function BriefForm({
           disabled={loading}
           className="border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-medium text-ink-950 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:border-ink-600 disabled:bg-ink-700 disabled:text-zinc-400"
         >
-          {loading ? "Running…" : "Generate Copy"}
+          {loading ? "Running..." : "Generate Copy"}
         </button>
       </div>
     </form>

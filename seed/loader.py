@@ -1,12 +1,7 @@
 """Startup seed loader.
 
-A fresh deployment has an empty golden dataset and empty memory, so the very
-first visitor would see zeroed stats and get no few-shot retrieval. To avoid
-that cold-start look, we load a small set of pre-scored example outputs into
-both SQLite (golden) and ChromaDB (memory) the first time the app boots with an
-empty golden table.
-
-Idempotent: if the golden dataset already has entries, this does nothing.
+Loads a few pre-scored examples into golden + memory on first boot so a fresh
+deployment isn't cold (zeroed stats, no retrieval). No-op if golden is non-empty.
 """
 
 import json

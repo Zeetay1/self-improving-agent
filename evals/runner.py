@@ -1,13 +1,8 @@
-"""Eval runner: runs the golden dataset against any prompt config and checks
-for regressions.
+"""Eval runner: re-scores the golden dataset against a prompt version.
 
-For each golden entry we regenerate copy for the same brief + variant using the
-prompt version under test, re-judge it, and compare the new weighted score to
-the entry's stored baseline. If any entry drops by more than REGRESSION_TOLERANCE
-(0.5), the run is marked failed.
-
-This is what guards a prompt-version swap (see agent/prompts.py) and what the
-pytest regression suite drives.
+For each golden entry, regenerate copy for the same brief + variant, re-judge
+it, and compare to the stored baseline. A drop > REGRESSION_TOLERANCE (0.5)
+fails the run. Guards prompt-version swaps and backs the pytest regression suite.
 """
 
 from dataclasses import dataclass, field
@@ -108,7 +103,7 @@ def format_report(report: EvalReport) -> str:
         "",
     ]
     if report.count == 0:
-        lines.append("No golden entries yet — nothing to check. (PASS)")
+        lines.append("No golden entries yet - nothing to check. (PASS)")
         return "\n".join(lines)
 
     for i, r in enumerate(report.results, 1):
@@ -120,10 +115,10 @@ def format_report(report: EvalReport) -> str:
 
     lines.append("")
     if report.passed:
-        lines.append("RESULT: PASS — no entry regressed beyond tolerance.")
+        lines.append("RESULT: PASS - no entry regressed beyond tolerance.")
     else:
         lines.append(
-            f"RESULT: FAIL — {len(report.regressions)} entry(ies) regressed beyond "
+            f"RESULT: FAIL - {len(report.regressions)} entry(ies) regressed beyond "
             f"{REGRESSION_TOLERANCE}. Do not promote this prompt version."
         )
     return "\n".join(lines)

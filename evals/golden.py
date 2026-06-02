@@ -1,9 +1,8 @@
-"""Golden dataset manager.
+"""Golden dataset: the regression baseline.
 
-The golden dataset is the system's regression baseline: outputs that scored
-well enough (weighted average >= GOLDEN_THRESHOLD) are captured with their
-brief, scores, and prompt version. The regression runner later re-scores each
-entry against the active prompt and checks for drift.
+Outputs scoring >= GOLDEN_THRESHOLD are captured with their brief, scores, and
+prompt version. The regression runner later re-scores each entry and checks
+for drift.
 """
 
 from typing import Any
