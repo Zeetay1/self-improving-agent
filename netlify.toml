@@ -2,6 +2,10 @@
 [build]
   base = "web"
   command = "npm run build"
+  # Point publish at Next's build output (path is relative to the repo root).
+  # Without this it defaults to the base dir, and the Next plugin rejects
+  # publish == base.
+  publish = "web/.next"
 
 [build.environment]
   NODE_VERSION = "20"
