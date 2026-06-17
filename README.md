@@ -25,7 +25,7 @@ without any human editing prompts in the hot path.
 
 ## Live Demo
 
-**🔗 Live demo:** https://self-improving-agent-delta.vercel.app
+**🔗 Live demo:** https://adcopy.zeetay.dev
 
 The hosted demo runs the full loop from the browser: fill the brief (pre-filled
 with a FitFuel example), click **Generate**, and watch the agent retrieve past
