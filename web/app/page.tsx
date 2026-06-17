@@ -159,7 +159,6 @@ export default function Page() {
       </div>
 
       <footer className="mt-10 border-t border-ink-700 pt-5 font-mono text-[11px] text-zinc-600">
-        Backend: FastAPI on Hugging Face Spaces · Frontend: Next.js on Vercel ·
         Judge &amp; generator: llama-3.3-70b
       </footer>
     </main>
