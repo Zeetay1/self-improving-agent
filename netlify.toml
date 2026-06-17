@@ -1,0 +1,12 @@
+# Netlify config for the Next.js frontend, which lives in web/.
+[build]
+  base = "web"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Official Next.js runtime (SSR/ISR/static + the App Router). Netlify installs
+# this automatically; listing it here makes the dependency explicit.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
